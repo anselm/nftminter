@@ -1,0 +1,12 @@
+typechain
+node_modules
+secrets.json
+cache
+artifacts
+types
+coverage
+coverage.json
+.env
+config
+yarn-error.log
+flatten
