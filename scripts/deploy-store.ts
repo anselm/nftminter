@@ -1,6 +1,7 @@
 import { ethers } from 'hardhat';
 import config from '../config/config.json';
 import fs from 'fs';
+import hre from 'hardhat'
 
 import contractjson from '../artifacts/contracts/NFTStore.sol/NFTStore.json'
 
@@ -11,11 +12,11 @@ const main: () => Promise<void> = async () => {
 	const store = await Store.deploy(config.name)
 	await store.deployed();
 	console.log('Deploy-Store: Contract deployed at:', store.address);
-	fs.writeFileSync(config.savestore,store.address);
+	fs.writeFileSync(config.savepath+"/address-"+hre.network.name+"-store.txt",store.address);
 
-	if(fs.existsSync(config.savemint)) {
+	if(fs.existsSync(config.savepath+"/address-"+hre.network.name+"-mint.txt")) {
 		console.log('Deploy-Store: Updating the mint to point to the new store')
-		let mintaddr = fs.readFileSync(config.savemint,'utf8').toString();
+		let mintaddr = fs.readFileSync(config.savepath+"/address-"+hre.network.name+"-mint.txt",'utf8').toString();
 		const Mint = await ethers.getContractFactory('NFTMint');
 		const mint = await Mint.attach(mintaddr);
 		let gas = ethers.BigNumber.from("0")

@@ -5,14 +5,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import PassReceiverData from '../config/pass-receiver-data.json';
 import config from '../config/config.json';
 
-
-
-interface DomainType {
-	name: string;
-	version: string;
-	chainId: number;
-	verifyingContract: string;
-}
+import { buildDomainSeparator } from './domain-separator'
 
 interface Signatures {
 	v: number;
@@ -21,35 +14,24 @@ interface Signatures {
 	amount: number;
 }
 
-const passReqMap: { [key: string]: Signatures } = {};
+const signatures: { [key: string]: Signatures } = {};
 
-const main = async () => {
+async function main() {
+	let domain = buildDomainSeparator();
 	const [owner] = await ethers.getSigners();
-	let storeaddr = fs.readFileSync(config.savestore,'utf8').toString();
-	let chainId = hre.network.name == "rinkeby" ? 4 : 1;
-	if(config.chainId != -1 && config.chainId != chainId) {
-		console.warn("**** Note the chainId you are forcing does not match what our sophisticated omniscannertron found ***");
-		chainId = config.chainId
-	}
-	let domain : DomainType = {
-		"name":config.name,
-		"version":config.version,
-		"chainId": chainId,
-		"verifyingContract":storeaddr
-	}
-	console.log(domain);
 	await Promise.all(
 		Object.entries(PassReceiverData).map(
 			async ([receiver, amount]) => {
 				let data = { receiver, amount }
 				const signature = await owner._signTypedData(domain, config.types, data);
 				let {r,s,v} = ethers.utils.splitSignature(signature);
-				passReqMap[receiver] = { v,r,s,amount }
+				signatures[receiver] = { v,r,s,amount }
 			}
 		)
 	);
-	fs.writeFileSync(config.savesigs, JSON.stringify(passReqMap));
-	console.log(passReqMap)
+	fs.writeFileSync(config.savepath+"/signatures-"+hre.network.name+".json", JSON.stringify(signatures));
+	console.log(signatures)
+	console.log("sign-message: Done!")
 };
 
 main().then(() => process.exit(0)).catch((error) => {

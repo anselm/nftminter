@@ -37,6 +37,7 @@ edit ./config/config.json
 	"baseURI": "https://myawesome.com/tokens/",
 	"version": "1",
 	"chainId": -1,
+	"value": 0.01,
 	"types":{
 		"PassReq": [
 			{ "name": "receiver", "type": "address" },
@@ -51,17 +52,17 @@ edit ./config/config.json
 
 ### 4. Deploy and verify the mint:
 
-This is basically your ERC 721 ... here is an example of deploying it by hand:
+This is a fairly vanilla ERC 721 ... you can also rewrite this to use an ERC 1155. Here is an example of deploying it by hand:
 
 yarn hardhat run scripts/deploy-mint.ts --network rinkeby
 
 This will spit out a deploy adddress. You can look at this on EtherScan. For example here is a pass I ran - and I can see the contract on the test ledger at:
 
-https://rinkeby.etherscan.io/address/0x47389c1CC6b183C066fABe79689dd39E3890E923
+https://rinkeby.etherscan.io/address/0x47389c1cc6b183c066fabe79689dd39e3890e923
 
 Please go ahead and verify your deploy so that etherscan will be able to show your interfaces (use your address not my example address):
 
-yarn hardhat verify --network rinkeby 0x47389c1CC6b183C066fABe79689dd39E3890E923 one one "https://myawesome.com/tokens/"
+yarn hardhat verify --network rinkeby 0x47389c1cc6b183c066fabe79689dd39e3890e923 "BUZZ" "BUZZ" "https://myawesome.com/tokens/"
 
 
 
@@ -69,30 +70,33 @@ yarn hardhat verify --network rinkeby 0x47389c1CC6b183C066fABe79689dd39E3890E923
 
 yarn hardhat run scripts/deploy-store.ts --network rinkeby
 
-You should see a result like : Contract deployed at: 0xb757bfEBC2aF4487a657827cAC8DD4f2e91f3318 -> take that and use it to verify:
+You should see a result like : Contract deployed at: 0x023fac77413Ee1E179B70c8e6a9c44c41db26A0c -> take that and use it to verify:
 
-yarn hardhat verify --network rinkeby 0xb757bfEBC2aF4487a657827cAC8DD4f2e91f3318 "BUZZ"
+yarn hardhat verify --network rinkeby 0x023fac77413Ee1E179B70c8e6a9c44c41db26A0c "BUZZ"
 
 The store should show up somewhere in the possible space of ethereum:
 
-https://rinkeby.etherscan.io/address/0xb757bfEBC2aF4487a657827cAC8DD4f2e91f3318
+https://rinkeby.etherscan.io/address/0x023fac77413Ee1E179B70c8e6a9c44c41db26A0c
 
 
 
 ### 6. Point the store at the mint and point the mint at the store
 
-I wrote helpers for this but always best to verify - can do by hand on etherscan.
+I wrote helpers that should automate this (see scripts/deploy-store.ts - but always best to verify - can do by hand on etherscan.
 
 
 ### 7. Turn on the mainSale and the preSale for testing
 
-They are on by default; so actually you may want to turn them off!.
-
+Nothing will work and you will be sad if you do not turn these on.
 
 
 ### 8. Sign the VIP passes and generate signed VIP perms:
 
-Make sure to set the chainId in the pass-receiver-data.json the way you want! The algos attempt to scan for this.
+It's worth walking through whats going on here. Basically EIP 712 does two separate things. First, it shows the human intermediary, the buyer, what is going on behind the scenes. It is a way of letting somebody see what the client (metamask) and the ledger (the contract on the ledger) intend to do. This gives the user an opportunity to say no. Secondly, it performs an actual function call; passing some arguments from the client (metamask and in this case your whole client side web3 app) to the ledger (the contract).
+
+The idea of signing arguments for a function call is super helpful all around, for many reasons. It allows the contract running on the ledger to feel comfortable that arguments are being passed from a legitimate channel. Since it is impossible? (extremely unlikely) that the arguments can be forged (since they are signed) it becomes a way to know that an action being requested is endorsed by the contract creators. It also lets the human participants in this transaction feel safer.
+
+The mechanics behind this are that the contract creator can use a private key to sign any data that they want to send to the contract. For security reasons it makes sense that the contract creator sign all the data earlier, and then not leave their private key lying around obviously. So typically, such as say in granting whitelist passes to VIPS, every pass is signed ahead of time, and then those signed passes can be sent to the contract at will; whenever we want to let a VIP in.
 
 Create a file similar to this in config/pass-receiver-data.json if you don't have one already - with who gets passes...
 
@@ -149,6 +153,19 @@ https://docs.ethers.io/v5/api/signer/ <- how ethers makes EIP712 functions avail
 
 
 ### NOTES AND TODOS
+
+	- immediate
+		- test
+		- write test suites
+
+	- later
+		- deal with generating mutations
+		- deal with pinata; posting mutations
+
+	- future
+		- look at contracts that do fancier things such as game like things
+
+
 
 	- add debugging tools such as remix to docs!
 

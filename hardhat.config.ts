@@ -7,17 +7,13 @@ import 'hardhat-contract-sizer';
 import 'hardhat-tracer';
 import 'solidity-coverage';
 import { HardhatUserConfig } from 'hardhat/config';
-import dotenv from 'dotenv';
 
-
+const { ALCHEMY_KEY_ROPSTEN } = require('./secrets.json')
 const { INFURA_KEY_MAINNET } = require('./secrets.json')
 const { INFURA_KEY_RINKEBY } = require('./secrets.json')
 const { RINKEBY_PRIV_KEY } = require('./secrets.json')
 const { MAINNET_PRIV_KEY } = require('./secrets.json')
-
-//const { ETHERSCAN_KEY } = require('./secrets.json')
-
-let ETHERSCAN_KEY = "YB6JB2DN896C398GK1Z4AVQANTXQVABJEQ"
+const { ETHERSCAN_KEY } = require('./secrets.json')
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -33,6 +29,10 @@ const config: HardhatUserConfig = {
    settings: { optimizer: {enabled: true,runs: 200} },
   },
   networks: {
+    ropsten: {
+      url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_KEY_ROPSTEN}`,
+      accounts: [`0x${RINKEBY_PRIV_KEY}`]
+    },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${INFURA_KEY_RINKEBY}`,
       accounts: [`0x${RINKEBY_PRIV_KEY}`]
