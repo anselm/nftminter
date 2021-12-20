@@ -126,32 +126,30 @@ async function main() {
 		// ------------------------------------------------------ paranonia test non ethers things -----------------------
 
 		// rpc does seem stable
-		// await test_raw_rpc()
+		await test_raw_rpc()
 
 		// ------------------------------------------------------ test minter and store with web3 -----------------------
 
 		// these seem to work well
-		// await test_web3_low_level_mint(signer.address,signer.address);
+		await test_web3_low_level_mint(signer.address,signer.address);
 
 		// test: paranoia test the store from web3 - works well - has hardcoded gas however
-		// await test_web3_store_main(signer.address,signer.address,priceforone,numbertobuy);
+		await test_web3_store_main(signer.address,signer.address,priceforone,numbertobuy);
 
 		// ------------------------------------------------------ testing minter ethers -----------------------
 
 		// test: paranoia test the minter, attempt to mint (basically gifting) directly on minter
-		// await test_ethers_low_level_minter(mint,signer.address)
+		await test_ethers_low_level_minter(mint,signer.address)
 
 		// ------------------------------------------------------ testing store -----------------------
 
 		// test: gifting from store to ourselves
-		// await test_ethers_store_gift(store,signer.address)
+		await test_ethers_store_gift(store,signer.address)
 
 		// ------------------------------------------------------ test signed transactions -----------------------
-
-		// await test_ethers_store_mint(store,signer.address,priceforone,numbertobuy)
+		await test_ethers_store_mint(store,signer.address,priceforone,numbertobuy)
 
 		// ------------------------------------------------------ test signed transactions -----------------------
-
 		await test_ethers_store_signed_premint(store,signer.address,priceforone,numbertobuy,signer)
 
 		// ------------------------------------------------------ done
